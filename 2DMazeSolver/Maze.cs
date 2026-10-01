@@ -5,69 +5,77 @@ using System.Xml.Serialization;
 
 namespace _2DMazeSolver;
 
-public class Maze(char[][] unsolvedMaze, int startCol = -1, int startRow = -1)
+public class Maze(char[,] unsolvedMaze, int startCol = -1, int startRow = -1)
 {
-    public char[][] UnsolvedMaze { get; init; } = unsolvedMaze; // [theRowYouAreOn:y:0top][theColYouAreOn:x:0left]
-    public Dictionary<char[][], int> Solutions { get; private set; } = []; // solution array, path length
-    public char[][] SolutionMaze { get; private set; } = unsolvedMaze;
+    public char[,] UnsolvedMaze { get; init; } = unsolvedMaze; // [theRowYouAreOn:y:0top, theColYouAreOn:x:0left]
+    public List<Solution> Solutions { get; private set; } = [];
 
-    private readonly Dictionary<string, char> CellState = new()
-    {
-        ["start"]   = 'S',
-        ["goal"]    = 'G',
-        ["open"]    = '.',
-        ["blocked"] = '#',
-        ["visited"] = 'x',
-    };
-
+    // Start coordinates
     private int StartCol = startCol;
     private int StartRow = startRow;
 
+    // Max indices
+    private readonly int RowCount = unsolvedMaze.GetLength(0); // 1 for column length
+    private readonly int ColCount = unsolvedMaze.GetLength(1); // 0 for row length
+
+    // Possible cell states
+    private static class CellState
+    {
+        public const char Start = 'S';
+        public const char Goal = 'G';
+        public const char Open = '.';
+        public const char Blocked = '#';
+        public const char Visited = 'x';
+    }
+
     /// <summary>
-    /// Finds a path, if one exists from the start of the maze to the goal
+    /// Finds a path, if one exists, from the start of the maze to the goal
     /// </summary>
     /// <returns>true if a path was found, false if not</returns>
     public bool FindPath()
     {
-        if (StartCol < 0 || StartRow < 0)
+        if (StartCol < 0 || StartRow < 0 || StartCol > (ColCount - 1) || StartRow > (RowCount - 1))
         {
             DetermineStartCoordinates();
         }
 
-        return FindPath(StartCol, StartRow);
+        Solutions.Clear();
+
+        return FindPath(StartRow, StartCol, CopyMaze(UnsolvedMaze), 0);
     }
 
 
-    private bool FindPath(int row, int col)
+    private bool FindPath(int row, int col, char[,] maze, int pathLength)
     {
-        // check base cases
-        if (col < 0
-            || row < 0
-            || col > (SolutionMaze.GetLength(0) - 1) // 0 for row length
-            || row > (SolutionMaze.GetLength(1) - 1) // 0 for column length
-            ) return false; // outside maze
-        
-        if (SolutionMaze[row][col] == CellState["goal"]) return true;
+        // boundary checks
+        if (row < 0 || row > (RowCount - 1) || col < 0 || col > (ColCount - 1)) return false;
 
-        if (SolutionMaze[row][col] == CellState["blocked"]
-            || SolutionMaze[row][col] == CellState["visited"] // loop
-            ) return false;
+        var cellState = maze[row, col];
+        var newPathLength = pathLength + 1;
+
+        // collision checks
+        if (cellState == CellState.Blocked || cellState == CellState.Visited) return false;
+
+        // goal check
+        if (cellState == CellState.Goal)
+        {
+            SaveSolution(maze, newPathLength);
+            return true;
+        }
 
         // mark current coordinates as part of solution path
-        SolutionMaze[row][col] = CellState["visited"];
+        maze[row, col] = CellState.Visited;
 
-        // find next step in path
-        if (FindPath(row - 1, col) is true
-            || FindPath(row, col + 1) is true
-            || FindPath(row + 1, col) is true
-            || FindPath(row, col - 1) is true
-            ) return true;
+        // find next step in path (unlike ||, | should evaluate both sides of the operator)
+        var result = FindPath(row - 1, col, maze, newPathLength)
+            | FindPath(row, col + 1, maze, newPathLength)
+            | FindPath(row + 1, col, maze, newPathLength)
+            | FindPath(row, col - 1, maze, newPathLength);
+        
+        // backtrack
+        maze[row, col] = cellState;
 
-        // no route forward from this cell found
-        // unmark current coordinates
-        SolutionMaze[row][col] = CellState["open"];
-
-        return false;
+        return result;
     }
     
     /// <summary>
@@ -77,11 +85,11 @@ public class Maze(char[][] unsolvedMaze, int startCol = -1, int startRow = -1)
     /// </summary>
     private void DetermineStartCoordinates()
     {
-        for (int row = 0; row < SolutionMaze.GetLength(0); row++)
+        for (int row = 0; row < RowCount; row++)
         {
-            for (int col = 0; col < SolutionMaze.GetLength(1); col++)
+            for (int col = 0; col < ColCount; col++)
             {
-                if (SolutionMaze[row][col] == CellState["start"])
+                if (UnsolvedMaze[row, col] == CellState.Start)
                 {
                     StartCol = col;
                     StartRow = row;
@@ -92,6 +100,33 @@ public class Maze(char[][] unsolvedMaze, int startCol = -1, int startRow = -1)
         }
 
         throw new ArgumentException("Start coordinates could not be determined for the maze. " +
-            $"Double check maze has a cell labeled {CellState["start"]}");
+            $"Double check maze has a cell labeled {CellState.Start}");
     }
+
+    /// <summary>
+    /// Makes a copy of a maze
+    /// </summary>
+    private char[,] CopyMaze(char[,] maze)
+    {
+        return (char[,])maze.Clone();
+    }
+
+    /// <summary>
+    /// Saves a maze solution to a list of solutions
+    /// </summary>
+    private void SaveSolution(char[,] maze, int pathLength)
+    {
+        var copiedMaze = CopyMaze(maze);
+
+        copiedMaze[StartRow, StartCol] = CellState.Start;
+
+        this.Solutions.Add(new(copiedMaze, pathLength));
+    }
+
+    /// <summary>
+    /// A solution to the maze
+    /// </summary>
+    /// <param name="Maze">The path from start to goal</param>
+    /// <param name="PathLength">The length of the path</param>
+    public record Solution(char[,] Maze, int PathLength);
 }
