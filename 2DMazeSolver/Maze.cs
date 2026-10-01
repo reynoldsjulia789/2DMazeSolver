@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
-
-namespace _2DMazeSolver;
+﻿namespace _2DMazeSolver;
 
 public class Maze(char[,] unsolvedMaze, int startCol = -1, int startRow = -1)
 {
