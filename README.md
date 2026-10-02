@@ -1,10 +1,12 @@
 # 2D Maze Solver
-This program will find solutions to a maze in .txt format.\
+This program will find solutions to a maze in .txt format.
+
 The maze should be a .txt file containing the following cell types in a grid represented by the indicated characters:
 - Start: 'S'
 - Goal: 'G'
 - Open (cells that can be navigated through): '.'
 - Blocked (walls/obstacles that cannot be navigated through): '#'
+
 The maze solver will output to a .txt file. Solution paths will be indicated with '+'
 
 ## How to Run
