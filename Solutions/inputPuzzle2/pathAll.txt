@@ -1,0 +1,86 @@
+----------- Maze -----------
+
+S#####
+.....#
+#.##.#
+#....#
+...#.G
+##...#
+
+----------- Solution 0 -----------
+
+S#####
+xxxxx#
+#.##x#
+#...x#
+...#xG
+##...#
+
+Path length: 10
+
+----------- Solution 1 -----------
+
+S#####
+xxxxx#
+#.##x#
+#.xxx#
+..x#xG
+##xxx#
+
+Path length: 16
+
+----------- Solution 2 -----------
+
+S#####
+xxxxx#
+#.##x#
+#xxxx#
+.xx#xG
+##xxx#
+
+Path length: 18
+
+----------- Solution 3 -----------
+
+S#####
+xx...#
+#x##.#
+#xxxx#
+...#xG
+##...#
+
+Path length: 10
+
+----------- Solution 4 -----------
+
+S#####
+xx...#
+#x##.#
+#xx..#
+..x#xG
+##xxx#
+
+Path length: 12
+
+----------- Solution 5 -----------
+
+S#####
+xx...#
+#x##.#
+#xxxx#
+.xx#xG
+##...#
+
+Path length: 12
+
+----------- Solution 6 -----------
+
+S#####
+xx...#
+#x##.#
+#x...#
+.xx#xG
+##xxx#
+
+Path length: 12
+

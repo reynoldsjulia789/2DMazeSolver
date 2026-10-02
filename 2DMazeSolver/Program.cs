@@ -7,7 +7,10 @@ public class Program
     public static void Main(string[] Args)
     {
         Console.WriteLine();
-        Console.WriteLine("To run the 2dMazeSolver: dotnet run --filepath <path to input file> [--all-paths]");
+        Console.WriteLine("To run the 2dMazeSolver:");
+        Console.WriteLine("dotnet run --filepath <path to input file> [--all-paths]");
+        Console.WriteLine("* filepath must be included");
+        Console.WriteLine("* all-paths flag is optional, including it will return all solutions instead of just 1");
 
         // parse args
         string? inputFilepath = null;
@@ -70,7 +73,15 @@ public class Program
             return;
         }
 
-        Console.WriteLine($"Found {solutionCount} solution{((solutionCount == 1) ? "" : "s")}");
+        if (allPaths is true)
+        {
+            Console.WriteLine($"Found {solutionCount} solution{((solutionCount == 1) ? "" : "s")}");
+        }
+        else
+        {
+            Console.WriteLine("Solution found");
+        }
+
 
         // Write solution to file
         var solutionsDirectory = $"../Solutions/{Path.GetFileNameWithoutExtension(inputFilepath)}";
@@ -86,7 +97,6 @@ public class Program
             using StreamWriter allSolutionsWriter = new StreamWriter(allPathsOutputFilepath);
 
             WriteMazeToFile(allSolutionsWriter, "Maze", maze.UnsolvedMaze);
-            allSolutionsWriter.WriteLine("---\r\n");
 
             var count = 0;
         
@@ -106,7 +116,6 @@ public class Program
         using StreamWriter oneSolutionWriter  = new StreamWriter(onePathOutputFilepath);
 
         WriteMazeToFile(oneSolutionWriter, "Maze", maze.UnsolvedMaze);
-        oneSolutionWriter.WriteLine("---\r\n");
         WriteMazeToFile(oneSolutionWriter, "Solution", maze.Solutions[0].Path, maze.Solutions[0].PathLength);
 
         Console.WriteLine($"One solution written to {onePathOutputFilepath}");
@@ -154,7 +163,8 @@ public class Program
         var rowCount = maze.GetLength(0);
         var colCount = maze.GetLength(1);
 
-        writer.WriteLine($"-----------{label}-----------");
+        writer.WriteLine($"----------- {label} -----------");
+        writer.WriteLine();
         
         for (var row = 0; row < rowCount; row++)
         {
