@@ -1,24 +1,51 @@
-﻿namespace _2DMazeSolver;
+﻿using System.IO;
+
+namespace _2DMazeSolver;
 
 public class Program
 {
     public static void Main(string[] Args)
     {
+        Console.WriteLine();
+        Console.WriteLine("To run the 2dMazeSolver: dotnet run --filepath <path to input file> [--all-paths]");
+
+        // parse args
+        string? inputFilepath = null;
+        bool allPaths = false;
+
+        for (var arg = 0; arg < Args.Length; arg++)
+        {
+            if (Args[arg] == "--filepath" && (arg + 1) < Args.Length)
+            {
+                inputFilepath = Args[arg + 1];
+            }
+
+            if (Args[arg] == "--all-paths")
+            {
+                allPaths = true;
+            }
+        }
+
+        if (inputFilepath is null)
+        {
+            Console.WriteLine("No filepath was provided." +
+                "\r\nPlease pass a filepath in the args." +
+                "\r\nExample: dotnet run --filepath <filepath>");
+            Console.WriteLine("Exiting program.");
+            return;
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("Reading file...");
+
         char[,] file;
-        var onePathOutputFilepath  = "path1.txt";
-        var allPathsOutputFilepath = "pathAll.txt"; 
 
         // Read file
         try
         {
-            if (Args.Length == 0)
-            {
-                throw new ArgumentException("No filepath was provided." +
-                    "\r\nPlease pass a filepath in the args." +
-                    "\r\nExample: dotnet run --<filepath>");
-            }
+            file = ReadMazeFile(inputFilepath);
 
-            file = ReadMazeFile(Args[0]);
+            Console.WriteLine($"Read maze from filepath: {inputFilepath}");
         }
         catch (Exception caught)
         {
@@ -31,35 +58,59 @@ public class Program
         // Find Path
         var maze = new Maze(file);
 
+        Console.WriteLine("Searching for solutions...");
+
         _ = maze.FindPath();
 
-        if (maze.Solutions.Count < 1)
+        var solutionCount = maze.Solutions.Count;
+
+        if (solutionCount < 1)
         {
             Console.WriteLine("No paths were found");
             return;
         }
 
+        Console.WriteLine($"Found {solutionCount} solution{((solutionCount == 1) ? "" : "s")}");
+
         // Write solution to file
-        using StreamWriter oneSolutionWriter  = new StreamWriter(onePathOutputFilepath);
-        using StreamWriter allSolutionsWriter = new StreamWriter(allPathsOutputFilepath);
+        var solutionsDirectory = $"../Solutions/{Path.GetFileNameWithoutExtension(inputFilepath)}";
 
-        WriteMazeToFile(oneSolutionWriter, "Maze", maze.UnsolvedMaze);
-        oneSolutionWriter.WriteLine("---");
-        WriteMazeToFile(oneSolutionWriter, "Solution", maze.Solutions[0].Path, maze.Solutions[0].PathLength);
+        Directory.CreateDirectory(solutionsDirectory);
 
-        WriteMazeToFile(allSolutionsWriter, "Maze", maze.UnsolvedMaze);
-        allSolutionsWriter.WriteLine("---");
+        Console.WriteLine("Writing to file");
 
-        var count = 0;
+        if (allPaths is true)
+        {
+            var allPathsOutputFilepath = $"{solutionsDirectory}/pathAll.txt";
+
+            using StreamWriter allSolutionsWriter = new StreamWriter(allPathsOutputFilepath);
+
+            WriteMazeToFile(allSolutionsWriter, "Maze", maze.UnsolvedMaze);
+            allSolutionsWriter.WriteLine("---\r\n");
+
+            var count = 0;
         
-        foreach (var solution in maze.Solutions)
-        { 
-            WriteMazeToFile(allSolutionsWriter, $"Solution {count}", solution.Path, solution.PathLength);
-            count++;
+            foreach (var solution in maze.Solutions)
+            { 
+                WriteMazeToFile(allSolutionsWriter, $"Solution {count}", solution.Path, solution.PathLength);
+                count++;
+            }
+            
+            Console.WriteLine($"All solutions written to {allPathsOutputFilepath}");
+            Console.WriteLine();
+            return;
         }
 
+        var onePathOutputFilepath  = $"{solutionsDirectory}/path1.txt";
+
+        using StreamWriter oneSolutionWriter  = new StreamWriter(onePathOutputFilepath);
+
+        WriteMazeToFile(oneSolutionWriter, "Maze", maze.UnsolvedMaze);
+        oneSolutionWriter.WriteLine("---\r\n");
+        WriteMazeToFile(oneSolutionWriter, "Solution", maze.Solutions[0].Path, maze.Solutions[0].PathLength);
+
         Console.WriteLine($"One solution written to {onePathOutputFilepath}");
-        Console.WriteLine($"All solutions written to {allPathsOutputFilepath}");
+        Console.WriteLine();
     }
 
     /// <summary>
