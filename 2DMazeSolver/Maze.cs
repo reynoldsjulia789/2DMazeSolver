@@ -14,7 +14,7 @@ public class Maze(char[,] unsolvedMaze, int startCol = -1, int startRow = -1)
     private readonly int ColCount = unsolvedMaze.GetLength(1); // 0 for row length
 
     // Possible cell states
-    private static class CellState
+    public static class CellState
     {
         public const char Start = 'S';
         public const char Goal = 'G';
@@ -121,7 +121,7 @@ public class Maze(char[,] unsolvedMaze, int startCol = -1, int startRow = -1)
     /// <summary>
     /// A solution to the maze
     /// </summary>
-    /// <param name="Maze">The path from start to goal</param>
+    /// <param name="Path">The path from start to goal</param>
     /// <param name="PathLength">The length of the path</param>
-    public record Solution(char[,] Maze, int PathLength);
+    public record Solution(char[,] Path, int PathLength);
 }
