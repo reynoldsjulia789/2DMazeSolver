@@ -20,7 +20,7 @@ public class Maze(char[,] unsolvedMaze, int startCol = -1, int startRow = -1)
         public const char Goal = 'G';
         public const char Open = '.';
         public const char Blocked = '#';
-        public const char Visited = 'x';
+        public const char Visited = '+';
     }
 
     /// <summary>
