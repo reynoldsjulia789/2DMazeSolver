@@ -8,7 +8,7 @@ public class Program
     {
         PrintRunInstructions();
 
-        // parse args
+        // Setup
         string? inputFilepath = null;
         bool allPaths = false;
 
@@ -34,17 +34,19 @@ public class Program
             return;
         }
 
+        // Read file
         Console.WriteLine();
         Console.WriteLine("Reading file...");
 
+        var inputFilename = Path.GetFileNameWithoutExtension(inputFilepath);
+        
         char[,] file;
 
-        // Read file
         try
         {
             file = ReadMazeFile(inputFilepath);
 
-            Console.WriteLine($"Read maze from filepath: {inputFilepath}");
+            Console.WriteLine($"Read maze from file: {inputFilename}");
         }
         catch (Exception caught)
         {
@@ -78,9 +80,8 @@ public class Program
             Console.WriteLine("Solution found");
         }
 
-
         // Write solution to file
-        var solutionsDirectory = $"../Solutions/{Path.GetFileNameWithoutExtension(inputFilepath)}";
+        var solutionsDirectory = $"../Solutions/{inputFilename}";
 
         Directory.CreateDirectory(solutionsDirectory);
 
@@ -195,7 +196,7 @@ public class Program
         Console.WriteLine();
         Console.WriteLine("To run the 2dMazeSolver:");
         Console.WriteLine("dotnet run --filepath <path to input file> [--all-paths]");
-        Console.WriteLine("* filepath must be included");
+        Console.WriteLine("* filepath to .txt file containing the unsolved maze must be included");
         Console.WriteLine("* all-paths flag is optional, including it will return all solutions instead of just 1");
 
         Console.ResetColor();
