@@ -96,7 +96,7 @@ public class Program
 
             WriteMazeToFile(allSolutionsWriter, "Maze", maze.UnsolvedMaze);
 
-            var count = 0;
+            var count = 1;
         
             foreach (var solution in maze.Solutions)
             { 
