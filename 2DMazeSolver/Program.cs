@@ -6,11 +6,7 @@ public class Program
 {
     public static void Main(string[] Args)
     {
-        Console.WriteLine();
-        Console.WriteLine("To run the 2dMazeSolver:");
-        Console.WriteLine("dotnet run --filepath <path to input file> [--all-paths]");
-        Console.WriteLine("* filepath must be included");
-        Console.WriteLine("* all-paths flag is optional, including it will return all solutions instead of just 1");
+        PrintRunInstructions();
 
         // parse args
         string? inputFilepath = null;
@@ -183,5 +179,21 @@ public class Program
         }
 
         writer.WriteLine();
+    }
+
+    /// <summary>
+    /// Prints the instructions on how to run the program
+    /// </summary>
+    private static void PrintRunInstructions()
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+
+        Console.WriteLine();
+        Console.WriteLine("To run the 2dMazeSolver:");
+        Console.WriteLine("dotnet run --filepath <path to input file> [--all-paths]");
+        Console.WriteLine("* filepath must be included");
+        Console.WriteLine("* all-paths flag is optional, including it will return all solutions instead of just 1");
+
+        Console.ResetColor();
     }
 }
