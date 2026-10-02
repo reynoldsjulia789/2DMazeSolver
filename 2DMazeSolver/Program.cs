@@ -86,6 +86,8 @@ public class Program
 
         Console.WriteLine("Writing to file");
 
+        Console.ForegroundColor = ConsoleColor.Yellow;
+
         if (allPaths is true)
         {
             var allPathsOutputFilepath = $"{solutionsDirectory}/pathAll.txt";
@@ -116,6 +118,8 @@ public class Program
 
         Console.WriteLine($"One solution written to {onePathOutputFilepath}");
         Console.WriteLine();
+
+        Console.ResetColor();
     }
 
     /// <summary>
